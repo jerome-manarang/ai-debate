@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey:process.env.REACT_APP_OPENAPI_API_KEY,
+  dangerouslyAllowBrowser: true
+});
 
 function TitlePage({ onStart }) {
   return (
@@ -12,124 +18,179 @@ function TitlePage({ onStart }) {
   );
 }
 
+function TopicPage({ onSubmit }) {
+  const [topic, setTopic] = useState('');
 
-/*const responses = [
-    "Hello there!",
-    "HI I am robot",
-    "hello good user",
-    "hello welcome to our debate"
-  ];
+  const handleSubmit = () => {
+    if (topic.trim() !== '') {
+      onSubmit(topic);
+    }
+  };
 
-  const handleSend = () => {
+  return (
+    <div className="topic-page">
+      <h2>Enter the topic you want to debate:</h2>
+      <p>Ex: I think Marvel is better than DC</p>
+      <input
+        type="text"
+        value={topic}
+        onChange={(e) => setTopic(e.target.value)}
+        placeholder="Type your debate topic..."
+        className="topic-input"
+      />
+      <button className="send-button" onClick={handleSubmit}>
+        Submit
+      </button>
+    </div>
+  );
+}
+
+function ChatBox({ topic }) {
+  const [messages, setMessages] = useState([
+    { text: 'Hello, welcome to our debate! You may begin...', sender: 'ai' },
+  ]);
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
+  const chatEndRef = useRef(null);
+
+  const handleSend = async () => {
     if (input.trim() !== '') {
       // Add user message
-      setMessages(prevMessages => [...prevMessages, { text: input, sender: 'user' }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: input, sender: 'user' },
+      ]);
+  
+      const userMessage = input;
+      setInput('');
+  
+      try {
+        // Call the OpenAI API with the user's message and topic
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4",
+          messages: [
+            { role: "system", content: "You are debating against a user in a texting simulation." },
+            {
+              role: "user",
+              content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend.`,
+            },
+          ],
+        });
+  
+        // Ensure that completion.choices exists and contains the expected data
+        if (completion && completion.choices && completion.choices.length > 0) {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: completion.choices[0].message.content, sender: 'ai' },
+          ]);
+        } else {
+          console.error("Unexpected response format:", completion);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: "Sorry, I couldn't process that. Please try again.", sender: 'ai' },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error with OpenAI API:", error);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: "An error occurred. Please try again.", sender: 'ai' },
+        ]);
+      }
+    }
+  };
+  
+  /*const handleSend = () => {
+    if (input.trim() !== '') {
+      // Add user message
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: input, sender: 'user' },
+      ]);
+      const userMessage = input;
       setInput('');
 
-      // Simulate AI response
-      /*setTimeout(() => {
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        setMessages(prevMessages => [...prevMessages, { text: randomResponse, sender: 'ai' }]);
-      }, 500); // Add a slight delay to simulate AI thinking */
+      // Simulate a computer response
+      const randomResponses = [
+        'That’s an interesting point, but have you considered the opposite?',
+        'I see where you’re coming from, but I disagree with that reasoning.',
+        'Your argument has some valid points, but here’s why it might not hold up.',
+        'I appreciate your stance, but let’s think about the broader context.',
+      ];
+      const aiMessage = randomResponses[Math.floor(Math.random() * randomResponses.length)];
 
-      function ChatBox() {
-        const [messages, setMessages] = useState([]);
-        const [input, setInput] = useState('');
-        const chatEndRef = useRef(null);
-      
-        const handleSend = async () => {
-          if (input.trim() !== '') {
-            // Add user message
-            setMessages(prevMessages => [...prevMessages, { text: input, sender: 'user' }]);
-            setInput('');
-        
-            // Refine the AI prompt
-            const refinedPrompt = `You are a debate AI. The topic is: "${input}". Argue against the user's position with a clear and concise response.`;
-        
-            // API call to get AI response
-            try {
-              const response = await fetch('https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-2.7B', {
-                method: 'POST',
-                headers: { 
-                  'Authorization': `Bearer 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`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  inputs: refinedPrompt,
-                  parameters: { max_new_tokens: 150 } // Limit the number of tokens to prevent overly long responses
-                })
-              });
-              
-              const data = await response.json();
-              const aiMessage = data[0]?.generated_text.trim() || "Sorry, something went wrong.";
-              
-              // Add AI response
-              setMessages(prevMessages => [...prevMessages, { text: aiMessage, sender: 'ai' }]);
-        
-            } catch (error) {
-              console.error("Error fetching AI response:", error);
-              setMessages(prevMessages => [...prevMessages, { text: "Error generating response.", sender: 'ai' }]);
-            }
-          }
-        };
-        
-      
-        // Function to scroll to the bottom of the chat
-        const scrollToBottom = () => {
-          chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        };
-      
-        // Scroll to bottom when messages change
-        useEffect(() => {
-          scrollToBottom();
-        }, [messages]);
-      
-        return (
-          <div className="chat-container">
-            <div className="heading">
-              <h1>AI Debater</h1>
-            </div>
-            <div className="chat-box">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`chat-message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
-                >
-                  {message.text}
-                </div>
-              ))}
-              <div ref={chatEndRef} />
-            </div>
-            <div className="input-container">
-              <input
-                type="text"
-                className="chat-input"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') handleSend();
-                }}
-              />
-              <button className="send-button" onClick={handleSend}>
-                Send
-              </button>
-            </div>
+      // Add AI response
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: aiMessage, sender: 'ai' },
+      ]);
+    }
+  }; */
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  return (
+    <div className="chat-container">
+      <div className="heading">
+        <h1>AI Debater</h1>
+      </div>
+      <div className="chat-box">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`chat-message ${
+              message.sender === 'user' ? 'user-message' : 'ai-message'
+            }`}
+          >
+            {message.text}
           </div>
-        );
-      }
-      
+        ))}
+        <div ref={chatEndRef} />
+      </div>
+      <div className="input-container">
+        <input
+          type="text"
+          className="chat-input"
+          placeholder="Type your message..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') handleSend();
+          }}
+        />
+        <button className="send-button" onClick={handleSend}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [started, setStarted] = useState(false);
+  const [topicSelected, setTopicSelected] = useState(false);
+  const [topic, setTopic] = useState('');
 
   const handleStart = () => {
     setStarted(true);
   };
 
+  const handleTopicSubmit = (selectedTopic) => {
+    setTopic(selectedTopic);
+    setTopicSelected(true);
+  };
+
   return (
     <div>
-      {started ? <ChatBox /> : <TitlePage onStart={handleStart} />}
+      {!started && <TitlePage onStart={handleStart} />}
+      {started && !topicSelected && <TopicPage onSubmit={handleTopicSubmit} />}
+      {started && topicSelected && <ChatBox topic={topic} />}
     </div>
   );
 }
