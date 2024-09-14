@@ -3,7 +3,7 @@ import './App.css';
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: "sk-ynDfJGkzxt1Uj71wjtxLKnqORJyupqUF3tve_fFg8VT3BlbkFJFFZTwjAsDPBSXvXw1lxmJJqyV_CN30DPDvWb7lwssA", /*process.env.REACT_APP_OPENAPI_API_KEY,*/
+  apiKey: process.env.REACT_APP_OPENAPI_API_KEY,
   dangerouslyAllowBrowser: true
 });
 
