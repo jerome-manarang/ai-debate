@@ -3,7 +3,7 @@ import './App.css';
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey:process.env.REACT_APP_OPENAPI_API_KEY,
+  apiKey: "sk-ynDfJGkzxt1Uj71wjtxLKnqORJyupqUF3tve_fFg8VT3BlbkFJFFZTwjAsDPBSXvXw1lxmJJqyV_CN30DPDvWb7lwssA", /*process.env.REACT_APP_OPENAPI_API_KEY,*/
   dangerouslyAllowBrowser: true
 });
 
@@ -29,7 +29,7 @@ function TopicPage({ onSubmit }) {
 
   return (
     <div className="topic-page">
-      <h2>Enter the topic you want to debate:</h2>
+      <h2>Enter YOUR opinion of the topic you want to debate:</h2>
       <p>Ex: I think Marvel is better than DC</p>
       <input
         type="text"
@@ -72,7 +72,7 @@ function ChatBox({ topic }) {
             { role: "system", content: "You are debating against a user in a texting simulation." },
             {
               role: "user",
-              content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend.`,
+              content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend. Please respond in the same amount of sentences as the user's response.`,
             },
           ],
         });

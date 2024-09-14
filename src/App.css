@@ -1,6 +1,11 @@
 body {
-  background-color: rgb(12, 80, 100);
+  background-color: rgb(23, 116, 144);
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
+
 
 .main-page {
   height: 90vh;
@@ -12,6 +17,8 @@ body {
   font-size: 30px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
+ /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Check how shadows affect the appearance */
+
 }
 
 .starting-button {
@@ -104,19 +111,20 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color:rgb(12, 80, 100);
+  background-color: rgb(23, 116, 144);
   font-family: Arial, sans-serif;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .topic-page h2 {
-  font-size: 24px;
-  color: #333;
+  font-size: 40px;
+  color: #231737;
   margin-bottom: 10px;
 }
 
 .topic-page p {
-  font-size: 16px;
-  color: #666666;
+  font-size: 20px;
+  color: #262525;
   margin-bottom: 20px;
 }
 
