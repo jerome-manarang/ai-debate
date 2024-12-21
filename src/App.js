@@ -1,184 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_OPENAPI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
-
-function TitlePage({ onStart }) {
-  return (
-    <div className="main-page">
-      <h1 className="title">AI Debater</h1>
-      <button className="starting-button" onClick={onStart}>
-        Begin
-      </button>
-    </div>
-  );
-}
-
-function TopicPage({ onSubmit }) {
-  const [topic, setTopic] = useState('');
-
-  const handleSubmit = () => {
-    if (topic.trim() !== '') {
-      onSubmit(topic);
-    }
-  };
-
-  return (
-    <div className="topic-page">
-      <h2>Enter YOUR opinion of the topic you want to debate:</h2>
-      <p>Ex: I think Marvel is better than DC</p>
-      <input
-        type="text"
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        placeholder="Type your debate topic..."
-        className="topic-input"
-      />
-      <button className="send-button" onClick={handleSubmit}>
-        Submit
-      </button>
-    </div>
-  );
-}
-
-function ChatBox({ topic }) {
-  const [messages, setMessages] = useState([
-    { text: 'Hello, welcome to our debate! You may begin...', sender: 'ai' },
-  ]);
-  const [input, setInput] = useState('');
-  const [typing, setTyping] = useState(false);
-  const chatEndRef = useRef(null);
-
-  const handleSend = async () => {
-    if (input.trim() !== '') {
-      // Add user message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, sender: 'user' },
-      ]);
-  
-      const userMessage = input;
-      setInput('');
-  
-      try {
-        // Call the OpenAI API with the user's message and topic
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4",
-          messages: [
-            { role: "system", content: "You are debating against a user in a texting simulation." },
-            {
-              role: "user",
-              content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend. Please respond in the same amount of sentences as the user's response.`,
-            },
-          ],
-        });
-  
-        // Ensure that completion.choices exists and contains the expected data
-        if (completion && completion.choices && completion.choices.length > 0) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { text: completion.choices[0].message.content, sender: 'ai' },
-          ]);
-        } else {
-          console.error("Unexpected response format:", completion);
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { text: "Sorry, I couldn't process that. Please try again.", sender: 'ai' },
-          ]);
-        }
-      } catch (error) {
-        console.error("Error with OpenAI API:", error);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: "An error occurred. Please try again.", sender: 'ai' },
-        ]);
-      }
-    }
-  };
-  
-  /*const handleSend = () => {
-    if (input.trim() !== '') {
-      // Add user message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, sender: 'user' },
-      ]);
-      const userMessage = input;
-      setInput('');
-
-      // Simulate a computer response
-      const randomResponses = [
-        'That’s an interesting point, but have you considered the opposite?',
-        'I see where you’re coming from, but I disagree with that reasoning.',
-        'Your argument has some valid points, but here’s why it might not hold up.',
-        'I appreciate your stance, but let’s think about the broader context.',
-      ];
-      const aiMessage = randomResponses[Math.floor(Math.random() * randomResponses.length)];
-
-      // Add AI response
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: aiMessage, sender: 'ai' },
-      ]);
-    }
-  }; */
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  return (
-    <div className="chat-container">
-      <div className="heading">
-        <h1>AI Debater</h1>
-      </div>
-      <div className="chat-box">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`chat-message ${
-              message.sender === 'user' ? 'user-message' : 'ai-message'
-            }`}
-          >
-            {message.text}
-          </div>
-        ))}
-        <div ref={chatEndRef} />
-      </div>
-      <div className="input-container">
-        <input
-          type="text"
-          className="chat-input"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') handleSend();
-          }}
-        />
-        <button className="send-button" onClick={handleSend}>
-          Send
-        </button>
-      </div>
-    </div>
-  );
-}
+import { supabase } from './supabaseClient'; // Import Supabase client
+import TitlePage from './components/TitlePage';
+import TopicPage from './components/TopicPage';
+import ChatBox from './components/ChatBox';
+import AuthModal from './components/AuthModal';
 
 function App() {
-  const [started, setStarted] = useState(false);
-  const [topicSelected, setTopicSelected] = useState(false);
+  const [started, setStarted] = useState(false); // Track if the game has started
+  const [topicSelected, setTopicSelected] = useState(false); // Track if a topic is selected
   const [topic, setTopic] = useState('');
+  const [session, setSession] = useState(null); // Track session (user login state)
+  const [currentPage, setCurrentPage] = useState('title'); // Track current page
+  const [authModalOpen, setAuthModalOpen] = useState(false); // Track modal open state
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
 
+  // Check if user is logged in on mount
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session); // Set the session if user is logged in
+    };
+
+    fetchSession();
+
+    // Listen for authentication changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        if (session) {
+          setCurrentPage('topic'); // Redirect to TopicPage on login
+        }
+      }
+    );
+
+    return () => {
+      if (authListener?.subscription) {
+        authListener.subscription.unsubscribe(); // Proper cleanup
+      }
+    };
+  }, []);
+
+  // Start the game when "Play without account" is clicked
   const handleStart = () => {
     setStarted(true);
+    setCurrentPage('topic'); // Go directly to TopicPage
   };
 
   const handleTopicSubmit = (selectedTopic) => {
@@ -186,11 +52,47 @@ function App() {
     setTopicSelected(true);
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setCurrentPage('title'); // Redirect to TitlePage on sign out
+  };
+
+  const openAuthModal = (mode) => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  // Render based on the current page and state
   return (
     <div>
-      {!started && <TitlePage onStart={handleStart} />}
-      {started && !topicSelected && <TopicPage onSubmit={handleTopicSubmit} />}
-      {started && topicSelected && <ChatBox topic={topic} />}
+      {currentPage === 'title' && (
+        <TitlePage
+          onStart={handleStart}
+          onLogin={() => openAuthModal('login')}
+          onSignUp={() => openAuthModal('signup')}
+        />
+      )}
+
+      {currentPage === 'topic' && (
+        <>
+          {session && <button onClick={handleSignOut}>Sign Out</button>}
+
+          {!topicSelected ? (
+            <TopicPage onSubmit={handleTopicSubmit} />
+          ) : (
+            <ChatBox topic={topic} />
+          )}
+        </>
+      )}
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        mode={authMode}
+        setMode={setAuthMode}
+        onSuccess={() => setCurrentPage('topic')}
+      />
     </div>
   );
 }

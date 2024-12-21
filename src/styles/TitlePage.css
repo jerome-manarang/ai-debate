@@ -1,0 +1,63 @@
+body {
+    background-color: #0F3954;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.main-page {
+    height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 700;
+    padding: 20px;
+    max-width: 600px;
+    gap: 20px;
+}
+
+.main-page .title {
+    color: white;
+    font-size: 70px;
+    margin-bottom: 20px;
+}
+
+.starting-button {
+    color: #D0D0FF;
+    background-color: black;
+    font-size: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    width: auto; /* Allow buttons to size automatically */
+    max-width: 300px;
+    text-align: center;
+}
+
+.starting-button:hover {
+    background-color: rgb(121, 78, 131);
+    color: rgb(133, 24, 133);
+}
+
+.button-group {
+    display: flex; /* Change to row layout */
+    flex-direction: row; /* Side-by-side buttons */
+    gap: 15px; /* Space between buttons */
+    justify-content: center; /* Center within the container */
+    align-items: center; /* Align vertically */
+}
+
+.animation-container {
+    margin-top: 20px;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
