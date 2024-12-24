@@ -1,5 +1,5 @@
 body {
-  background-color: rgb(23, 116, 144);
+  background-color: #0F3954;
   height: 100%;
   overflow: hidden;
   margin: 0;
@@ -7,33 +7,7 @@ body {
 }
 
 
-.main-page {
-  height: 90vh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  font-size: 30px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
- /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Check how shadows affect the appearance */
 
-}
-
-.starting-button {
-  color: rgb(83, 83, 164);
-  background-color: black;
-  font-size: 20px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-}
-
-.starting-button:hover {
-  background-color: rgb(121, 78, 131);
-  color: rgb(133, 24, 133);
-}
 
 .chat-container {
   display: flex;
@@ -61,6 +35,7 @@ body {
   padding: 10px;
   border-radius: 10px;
   max-width: 60%;
+  align-items: center;
 }
 
 .user-message {
@@ -111,20 +86,20 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: rgb(23, 116, 144);
+  background-color: #0F3954;
   font-family: Arial, sans-serif;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .topic-page h2 {
   font-size: 40px;
-  color: #231737;
+  color: #afaab6;
   margin-bottom: 10px;
 }
 
 .topic-page p {
   font-size: 20px;
-  color: #262525;
+  color: #928787;
   margin-bottom: 20px;
 }
 
@@ -168,4 +143,54 @@ body {
     width: 90%;
     padding: 10px 0;
   }
+}
+
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 57, 84, 0.85); /* Slightly transparent deep blue */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #FFFFFF; /* Keeps the modal content white for contrast */
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds depth to the modal */
+}
+
+.modal-switch-link {
+  color: #1E90FF; /* Bright blue for readability and emphasis */
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.modal-switch-link:hover {
+  color: #FFD700; /* Gold on hover for a dynamic effect */
+}
+
+.modal-close-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #FF4500; /* Bright orange-red for visibility */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.modal-close-button:hover {
+  background: #FF6347; /* Softer red on hover */
+  transform: scale(1.05); /* Slight scale-up for interactivity */
 }
