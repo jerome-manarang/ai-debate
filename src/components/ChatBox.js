@@ -8,53 +8,136 @@ function ChatBox({ topic }) {
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
     const chatEndRef = useRef(null);
-  
+
     const handleSend = async () => {
       if (input.trim() !== '') {
-        // Add user message
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: input, sender: 'user' },
-        ]);
-    
         const userMessage = input;
         setInput('');
     
+        // Add user message to chatbox
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: userMessage, sender: 'user' },
+        ]);
+    
+        let qualityScore = null;
+    
         try {
-          // Call the OpenAI API with the user's message and topic
-          const completion = await openai.chat.completions.create({
-            model: "gpt-4",
+          // Step 1: Attempt to send the user's message to the Python backend for scoring
+          const scoreResponse = await fetch('http://localhost:5000/score-response', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors',
+            body: JSON.stringify({ message: userMessage }),
+          });
+    
+          if (scoreResponse.ok) {
+            const scoreData = await scoreResponse.json();
+    
+            if (scoreData.quality_score !== undefined) {
+              qualityScore = scoreData.quality_score;
+              // Add quality score to chatbox
+              setMessages((prevMessages) => [
+                ...prevMessages,
+                { text: `Your response quality score: ${qualityScore}`, sender: 'ai' },
+              ]);
+            } else {
+              console.warn('Backend returned unexpected data:', scoreData);
+            }
+          } else {
+            console.warn('Backend is unreachable or returned an error.');
+          }
+        } catch (error) {
+          console.error('Error while communicating with the backend:', error);
+        }
+    
+        try {
+          // Step 2: Call OpenAI API with user's message and topic
+          const openAIResponse = await openai.chat.completions.create({
+            model: 'gpt-4',
             messages: [
-              { role: "system", content: "You are debating against a user in a texting simulation." },
+              { role: 'system', content: 'You are debating against a user in a texting simulation.' },
               {
-                role: "user",
+                role: 'user',
                 content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend. Please respond in the same amount of sentences as the user's response.`,
               },
             ],
           });
     
-          // Ensure that completion.choices exists and contains the expected data
-          if (completion && completion.choices && completion.choices.length > 0) {
+          if (openAIResponse && openAIResponse.choices && openAIResponse.choices.length > 0) {
             setMessages((prevMessages) => [
               ...prevMessages,
-              { text: completion.choices[0].message.content, sender: 'ai' },
+              { text: openAIResponse.choices[0].message.content, sender: 'ai' },
             ]);
           } else {
-            console.error("Unexpected response format:", completion);
+            console.error('Unexpected response format from OpenAI:', openAIResponse);
             setMessages((prevMessages) => [
               ...prevMessages,
-              { text: "Sorry, I couldn't process that. Please try again.", sender: 'ai' },
+              { text: 'Sorry, I could not process that. Please try again.', sender: 'ai' },
             ]);
           }
         } catch (error) {
-          console.error("Error with OpenAI API:", error);
+          console.error('Error during OpenAI API call:', error);
           setMessages((prevMessages) => [
             ...prevMessages,
-            { text: "An error occurred. Please try again.", sender: 'ai' },
+            { text: 'An error occurred. Please try again.', sender: 'ai' },
           ]);
         }
       }
     };
+    
+  
+    // const handleSend = async () => {
+    //   if (input.trim() !== '') {
+    //     setMessages((prevMessages) => [
+    //       ...prevMessages,
+    //       { text: input, sender: 'user' },
+    //     ]);
+    //     const userMessage = input;
+    //     setInput('');
+    
+    //     try {
+    //       // Call the OpenAI API with the user's message and topic
+    //       const completion = await openai.chat.completions.create({
+    //         model: "gpt-4",
+    //         messages: [
+    //           { role: "system", content: "You are debating against a user in a texting simulation." },
+    //           {
+    //             role: "user",
+    //             content: `The user's opinion is: ${topic}. They state: "${userMessage}". Rebuttal this, as if you are just the user's friend. Please respond in the same amount of sentences as the user's response.`,
+    //           },
+    //         ],
+    //       });
+    
+    //       // Ensure that completion.choices exists and contains the expected data
+    //       if (completion && completion.choices && completion.choices.length > 0) {
+    //         let aiResponse = completion.choices[0].message.content;
+    
+    //         // Add quotation marks if missing
+    //         if (!aiResponse.startsWith('"') || !aiResponse.endsWith('"')) {
+    //           aiResponse = `"${aiResponse}"`;
+    //         }
+    
+    //         setMessages((prevMessages) => [
+    //           ...prevMessages,
+    //           { text: aiResponse, sender: 'ai' },
+    //         ]);
+    //       } else {
+    //         console.error("Unexpected response format:", completion);
+    //         setMessages((prevMessages) => [
+    //           ...prevMessages,
+    //           { text: "Sorry, I couldn't process that. Please try again.", sender: 'ai' },
+    //         ]);
+    //       }
+    //     } catch (error) {
+    //       console.error("Error with OpenAI API:", error);
+    //       setMessages((prevMessages) => [
+    //         ...prevMessages,
+    //         { text: "An error occurred. Please try again.", sender: 'ai' },
+    //       ]);
+    //     }
+    //   }
+    // };
     
     /*const handleSend = () => {
       if (input.trim() !== '') {
