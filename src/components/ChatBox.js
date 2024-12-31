@@ -24,13 +24,20 @@ function ChatBox({ topic }) {
     
         try {
           // Step 1: Attempt to send the user's message to the Python backend for scoring
-          const scoreResponse = await fetch('http://localhost:5000/score-response', {
+          const scoreResponse = await fetch('/score-response', {
+
+
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ message: userMessage }),
-          });
-    
+        });
+        
+
+
+
+                
           if (scoreResponse.ok) {
             const scoreData = await scoreResponse.json();
     
