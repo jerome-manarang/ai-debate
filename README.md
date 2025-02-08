@@ -1,11 +1,22 @@
-The purpose of this application is to allow the user to simulate a debate against a friend on any topic of their choosing.
-This is to help users practice casual debates, or even professional debates for their career. The program uses AI in order to
-provide an experience that seems natural and real. 
+Welcome to AI Debater!
 
+This web application is made for you to practice using debate skills based off a topic of your choice.
+You will be put in a text simulator, and your responses will be scored. The scoring will be based 
+upon the following the criteria:
 
-How to use:
-1. Click "begin"
-2. Enter a topic of your choosing that has your opinion. For example: "I think winter is better than summer"
-3. The person you are competing against wants you to go first. You may start with a stance and reason for your opinion 
+1. Clarity and Simplicity (20%):
+    How clear is your response, and do you use simple language to convey your point?
+    How much do you avoid using complex words that may make your response harder to comprehend?
 
+2. Argument Structure: (25%)
+    How well is your arugment structured, and focused on the claim you are making?
 
+3. Evidence/Reasoning: (30%)
+    Do you provide relevent research or examples to suport your claims?
+    Do you avoid making unsupoorted assertions?
+
+4. Refutation and Anticipation: (10%)
+    How effective do you address opposing aruguments?
+    
+5. Tone (15%)
+    How much do you maitain assertiveness without adding any aggression?

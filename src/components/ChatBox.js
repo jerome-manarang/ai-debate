@@ -24,7 +24,8 @@ function ChatBox({ topic }) {
     
         try {
           // Step 1: Attempt to send the user's message to the Python backend for scoring
-          const scoreResponse = await fetch('/score-response', {
+          const scoreResponse = await fetch('http://127.0.0.1:4000/score-response', {
+          //const scoreResponse = await fetch('/score-response', {
 
 
             method: 'POST',
