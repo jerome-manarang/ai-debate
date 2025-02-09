@@ -7,7 +7,11 @@ function ChatBox({ topic }) {
     ]);
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
+    const [score, setScore] = useState(0);
+    const [scoreChanged, setScoreChanged] = useState(false);
+    const [scoreDown, setScoreDown] = useState(false);
     const chatEndRef = useRef(null);
+  
 
     const handleSend = async () => {
       if (input.trim() !== '') {
@@ -21,6 +25,7 @@ function ChatBox({ topic }) {
         ]);
     
         let qualityScore = null;
+        let aiQualityScore = null;
     
         try {
           // Step 1: Attempt to send the user's message to the Python backend for scoring
@@ -41,14 +46,33 @@ function ChatBox({ topic }) {
                 
           if (scoreResponse.ok) {
             const scoreData = await scoreResponse.json();
-    
-            if (scoreData.quality_score !== undefined) {
-              qualityScore = scoreData.quality_score;
-              // Add quality score to chatbox
+            if (!scoreData.valid_input){
               setMessages((prevMessages) => [
                 ...prevMessages,
-                { text: `Your response quality score: ${qualityScore}`, sender: 'ai' },
+                { text: `I do not understand what you said, can you please restate or say something else?`, sender: 'ai' },
               ]);
+              return;
+            }
+            else if (scoreData.quality_score !== undefined) {
+              qualityScore = scoreData.quality_score;
+              // Add quality score to chatbox
+              // setMessages((prevMessages) => [
+              //   ...prevMessages,
+              //   { text: `Your response quality score: ${qualityScore}`, sender: 'ai' },
+              // ]);
+              setScore((prevScore) => {
+                const newScore = prevScore + qualityScore;
+                setScoreChanged(true); // Trigger color change effect
+
+                // Reset color after 2 seconds
+                setTimeout(() => {
+                    setScoreChanged(false);
+                }, 2000);
+
+                return newScore;
+            });
+
+            
             } else {
               console.warn('Backend returned unexpected data:', scoreData);
             }
@@ -77,7 +101,32 @@ function ChatBox({ topic }) {
               ...prevMessages,
               { text: openAIResponse.choices[0].message.content, sender: 'ai' },
             ]);
-          } else {
+
+            const scoreAI = await fetch('http://127.0.0.1:4000/score-response', {
+      
+
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: openAIResponse.choices[0].message.content }),
+            
+        });
+        if (scoreAI.ok){
+          const scoreAIData = await scoreAI.json();
+          aiQualityScore = scoreAIData.quality_score || 0;
+
+         
+          setScore((prevScore) => {
+              const newScore = Math.max(0, prevScore - aiQualityScore); 
+              setScoreDown(true);
+              setTimeout(() => setScoreDown(false), 2000);
+              return newScore;
+          });
+          } 
+        
+       }  else {
             console.error('Unexpected response format from OpenAI:', openAIResponse);
             setMessages((prevMessages) => [
               ...prevMessages,
@@ -108,6 +157,9 @@ function ChatBox({ topic }) {
       <div className="chat-container">
         <div className="heading">
           <h1>AI Debater</h1>
+          <h2 className={`score-display ${scoreChanged ? 'score-increase' : ''} ${scoreDown ? 'score-decrease' : ''}`}>
+    Score: {score}
+</h2>
         </div>
         <div className="chat-box">
           {messages.map((message, index) => (

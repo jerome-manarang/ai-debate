@@ -1,7 +1,7 @@
 from textblob import TextBlob
 
 def calculate_structure_score(user_message):
-    structure_diction = ["however", "On the other hand", "While i agree"]
+    structure_diction = ["however", "On the other hand", "while i agree"]
     user_message_lower = user_message.lower()  # Convert input to lowercase
     return sum(1 for value in structure_diction if value.lower() in user_message_lower)
 

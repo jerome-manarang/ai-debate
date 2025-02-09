@@ -12,8 +12,8 @@ function TopicPage({ onSubmit }) {
       topic.toLowerCase().includes(word)
       );
   
-      if (topic.trim() === '') {
-        setError('Topic cannot be empty.');
+      if (topic.trim() === '' || topic.trim().split(/\s+/).length < 3) {
+        setError('Please enter a valid topic.');
       }
       else if (containsBannedWords){
         setError('Your topic contains inapprorpiate words. Please choose another topic.')

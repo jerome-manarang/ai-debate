@@ -1,6 +1,11 @@
 import pytest
 from app import app 
 import json
+import re
+from collections import Counter
+from unittest.mock import patch, MagicMock
+from textblob import TextBlob
+from app import log_request_info, validate_input 
 
 @pytest.fixture
 def client():
@@ -70,3 +75,8 @@ def test_score_response_invalid_json(client):
     data = response.get_json()
     assert "error" in data
 
+
+
+def test_validate_input():
+    """Test validate_input with various valid and invalid cases."""
+    assert validate_input("I rest my case.") == True

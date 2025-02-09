@@ -6,7 +6,19 @@ body {
   padding: 0;
 }
 
+.score-display {
+  transition: color 0.5s ease-in-out;
+  color: black;
+}
 
+/* Green effect when score increases */
+.score-increase {
+  color: green;
+}
+
+.score-decrease{
+  color: red;
+}
 
 
 .chat-container {
@@ -16,6 +28,21 @@ body {
   height: 90vh;
   justify-content: center;
   
+}
+
+.chat-container h1{
+  font-size: 40px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: right;
+}
+.chat-container h2{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: right;
 }
 
 .chat-box {
@@ -71,7 +98,7 @@ body {
   color: white;
   padding: 10px 20px;
   border: none;
-  border-radius: 0 5px 5px 0;
+  border-radius: 5px 5px 5px 5px;
   cursor: pointer;
 }
 
@@ -85,10 +112,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
   background-color: #0F3954;
   font-family: Arial, sans-serif;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .topic-page h2 {
