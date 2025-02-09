@@ -94,8 +94,61 @@ function ChatBox({ topic }) {
       }
     };
     
+
   
-    // const handleSend = async () => {
+    const scrollToBottom = () => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+  
+    useEffect(() => {
+      scrollToBottom();
+    }, [messages]);
+  
+    return (
+      <div className="chat-container">
+        <div className="heading">
+          <h1>AI Debater</h1>
+        </div>
+        <div className="chat-box">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`chat-message ${
+                message.sender === 'user' ? 'user-message' : 'ai-message'
+              }`}
+            >
+              {message.text}
+            </div>
+          ))}
+          <div ref={chatEndRef} />
+        </div>
+        <div className="input-container">
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="Type your message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') handleSend();
+            }}
+          />
+          
+          <button className="send-button" onClick={handleSend}>
+            Send
+          </button>
+  
+  
+  
+        </div>
+      </div>
+    );
+  }
+
+  export default ChatBox;
+
+
+  // const handleSend = async () => {
     //   if (input.trim() !== '') {
     //     setMessages((prevMessages) => [
     //       ...prevMessages,
@@ -173,54 +226,3 @@ function ChatBox({ topic }) {
         ]);
       }
     }; */
-  
-    const scrollToBottom = () => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-  
-    useEffect(() => {
-      scrollToBottom();
-    }, [messages]);
-  
-    return (
-      <div className="chat-container">
-        <div className="heading">
-          <h1>AI Debater</h1>
-        </div>
-        <div className="chat-box">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`chat-message ${
-                message.sender === 'user' ? 'user-message' : 'ai-message'
-              }`}
-            >
-              {message.text}
-            </div>
-          ))}
-          <div ref={chatEndRef} />
-        </div>
-        <div className="input-container">
-          <input
-            type="text"
-            className="chat-input"
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') handleSend();
-            }}
-          />
-          
-          <button className="send-button" onClick={handleSend}>
-            Send
-          </button>
-  
-  
-  
-        </div>
-      </div>
-    );
-  }
-
-  export default ChatBox;
