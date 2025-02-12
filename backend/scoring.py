@@ -5,10 +5,11 @@ def calculate_structure_score(user_message):
     "however", "on the other hand", "while I agree", "therefore", "thus", "consequently", 
     "as a result", "in contrast", "nevertheless", "nonetheless", "moreover", "furthermore", 
     "additionally", "in conclusion", "to summarize", "to illustrate", "for example", 
-    "for instance", "in other words", "in summary", "to clarify", "alternatively"
+    "for instance", "in other words", "in summary", "to clarify", "alternatively", "that said",
+    "i see where",
 ]
     user_message_lower = user_message.lower()  
-    return sum(1 for value in structure_diction if value.lower() in user_message_lower)
+    return sum(1 for value in structure_diction if value.lower() in user_message_lower)*10
 
 def calculate_evidence_score(user_message):
     evidence_diction = evidence_diction = [
@@ -20,7 +21,7 @@ def calculate_evidence_score(user_message):
 ]
 
     user_message_lower = user_message.lower()
-    return sum(1 for value in evidence_diction if value.lower() in user_message_lower)
+    return sum(1 for value in evidence_diction if value.lower() in user_message_lower) *10
 
 def calculate_refute_score(user_message):
     refute_diction = refute_diction = [
@@ -33,7 +34,7 @@ def calculate_refute_score(user_message):
 ]
 
     user_message_lower = user_message.lower()
-    return sum(1 for value in refute_diction if value.lower() in user_message_lower)
+    return sum(1 for value in refute_diction if value.lower() in user_message_lower) *10
 
 def analyze_text(user_message):
     blob = TextBlob(user_message)

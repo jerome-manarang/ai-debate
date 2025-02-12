@@ -61,7 +61,7 @@ function ChatBox({ topic }) {
               //   { text: `Your response quality score: ${qualityScore}`, sender: 'ai' },
               // ]);
               setScore((prevScore) => {
-                const newScore = prevScore + qualityScore;
+                const newScore = prevScore + qualityScore*10;
                 setScoreChanged(true); // Trigger color change effect
 
                 // Reset color after 2 seconds
@@ -115,7 +115,7 @@ function ChatBox({ topic }) {
         });
         if (scoreAI.ok){
           const scoreAIData = await scoreAI.json();
-          aiQualityScore = scoreAIData.quality_score || 0;
+          aiQualityScore = scoreAIData.quality_score * 10;
 
          
           setScore((prevScore) => {
@@ -158,19 +158,21 @@ function ChatBox({ topic }) {
         <div className="heading">
           <h1>AI Debater</h1>
           <h2 className={`score-display ${scoreChanged ? 'score-increase' : ''} ${scoreDown ? 'score-decrease' : ''}`}>
-    Score: {score}
+    Score: {score*10}
 </h2>
         </div>
         <div className="chat-box">
           {messages.map((message, index) => (
             <div
-              key={index}
-              className={`chat-message ${
-                message.sender === 'user' ? 'user-message' : 'ai-message'
-              }`}
-            >
-              {message.text}
-            </div>
+            key={index}
+            className={`chat-message ${
+              message.sender === 'user' ? 'user-message' : 'ai-message'
+            }`}
+          >
+            {message.text.startsWith('"') && message.text.endsWith('"')
+              ? message.text.slice(1, -1)
+              : message.text}
+          </div>
           ))}
           <div ref={chatEndRef} />
         </div>
@@ -198,7 +200,6 @@ function ChatBox({ topic }) {
   }
 
   export default ChatBox;
-
 
   // const handleSend = async () => {
     //   if (input.trim() !== '') {
@@ -277,4 +278,17 @@ function ChatBox({ topic }) {
           { text: aiMessage, sender: 'ai' },
         ]);
       }
-    }; */
+    };
+    
+    <div className="heading">
+          <h2 className={`score-ai-disappear ${updateAI ? 'score-ai-appear' : 'score-ai-disappear'}`}>
+              +{scoreValue} </h2>
+          <h2 className={`score-user-disappear ${updateUser ? 'score-user-appear' : 'score-user-disappear'}`}>
+            +{scoreValue} </h2>
+          </div>
+     
+    
+    
+    */
+
+
