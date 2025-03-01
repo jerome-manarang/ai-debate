@@ -60,18 +60,3 @@ AI Debater is built with modern **full-stack technologies** to deliver a **fast,
 
 
 
-##  **Future Plans & Enhancements**  
-- 🔹 **Advanced AI Opponent** – Adjust difficulty levels for AI responses  
-- 🔹 **Leaderboard & Competitions** – Compete with friends and track scores  
-- 🔹 **Speech-to-Text Debating** – Voice recognition for a more natural debate experience  
-- 🔹 **More Debate Formats** – Lincoln-Douglas, Oxford-style, and more  
-
----
-
-## 🎤 **Get Started Today!**  
-Want to refine your debating skills? Try out **AI Debater** and start arguing like a pro!  
-
-🚀 **Stay tuned for updates!**  
-
----
-
